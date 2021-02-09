@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"sync"
 	"github.com/cfdrake/go-gdbm"
@@ -61,6 +62,14 @@ func (d *DB)Close() {
 	d.gdbm.Close()
 }
 
+func h2u(h string) uint64 {
+	v, err := strconv.ParseUint(h, 16, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return v
+}
+
 func (d *DB)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
 	var (
 		sk, sv string
@@ -81,23 +90,18 @@ func (d *DB)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
 		if err != nil {
 			return err
 		}
-		v, err = strconv.ParseUint(sv, 16, 64)
-		if err != nil {
-			return err
-		}
-		k, err = strconv.ParseUint(sk, 16, 64)
-		if err != nil {
-			return err
-		}
+		v = h2u(sv)
+		k = h2u(sk)
 		if k>=k2 {
 			break
 		}
-		//fmt.Printf("sk: %s, sv: %s\n", sk, sv)
+
+		sk, err = d.gdbm.NextKey(sk)
 		cont := f(k, v)
 		if !cont {
 			break
 		}
-		sk, err = d.gdbm.NextKey(sk)
+
 		if err==gdbm.NoError {
 			break
 		}

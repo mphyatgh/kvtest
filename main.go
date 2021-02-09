@@ -75,7 +75,7 @@ func genVal(seq uint64) uint64 {
 	return uint64(h.Sum32())
 }
 
-func list(key, value uint64) bool {
+func listFunc(key, value uint64) bool {
 	fmt.Printf("List: key=%d, value=%d\n", key, value)
 	return true
 }
@@ -95,6 +95,13 @@ func dbIns(num int) {
 	tpr := time.Duration(int(spt)/num)
 	fmt.Printf("total time:      %s\n", spt)
 	fmt.Printf("time per record: %s\n", tpr)
+}
+
+func delFunc(key, value uint64) bool {
+	if err := db.Del(key); err != nil {
+		log.Fatal(err)
+	}
+	return true
 }
 
 func s2i(s string) int {
@@ -165,11 +172,14 @@ func main() {
 		}
 		fmt.Printf("Put: key=%d, value=%d\n", key, value)
 	case "list":
-		db.List(0, MaxUint, list)
+		db.List(0, MaxUint, listFunc)
 	case "ins":
 		lenEqs(os.Args, 3)
 		num := s2i(os.Args[2])
 		dbIns(num)
+	case "clr":
+		lenEqs(os.Args, 2)
+		db.List(0, MaxUint, delFunc)
 	default:
 		help()
 		return
