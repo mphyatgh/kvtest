@@ -1,5 +1,5 @@
 all:
-	go build . 
+	go build .
 
 clean:
 	rm kv
