@@ -112,32 +112,3 @@ func (d *DB)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
 	return nil
 }
 
-/*
-Returns the nextkey after `key`. If there is not a next key, an
-NoError error will be returned.
-
-An Iteration might look like:
-
-  k, err := db.FirstKey()
-  if err != nil {
-    fmt.Fprintln(os.Stderr, err)
-    os.Exit(1)
-  }
-  for {
-    v, err := db.Fetch(k)
-    if err != nil {
-      fmt.Fprintln(os.Stderr, err)
-      os.Exit(1)
-    }
-    fmt.Println(v)
-
-    k, err = db.NextKey(k)
-    if err == gdbm.NoError {
-      break
-    } else if err != nil {
-      fmt.Fprintln(os.Stderr, err)
-      os.Exit(1)
-    }
-  }
-
-*/

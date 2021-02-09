@@ -11,6 +11,7 @@ import (
 	"encoding/binary"
 	"bytes"
 	"time"
+	_ "./cdb"
 )
 
 const (
