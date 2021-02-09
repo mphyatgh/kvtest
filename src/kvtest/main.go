@@ -27,21 +27,21 @@ var (
 
 func help() {
 	fmt.Printf(`
-    kvdb help                   -- this message 
-    kvdb get <key>              -- get a key
-    kvdb put <key> <val>        -- set key
-    kvdb del <key>              -- delete a key
-    kvdb list                   -- list all key in the db
+    kv help                   -- this message 
+    kv get <key>              -- get a key
+    kv put <key> <val>        -- set key
+    kv del <key>              -- delete a key
+    kv list                   -- list all key in the db
 
-    kvdb ins <num>              -- insert records in batch mode
-    kvdb clr                    -- remove all records in the database
-    kvdb verify                 -- get all records and verify them
+    kv ins <num>              -- insert records in batch mode
+    kv clr                    -- remove all records in the database
+    kv verify                 -- get all records and verify them
 
-    kvdb rget                   -- get record from the databse randomly
-    kvdb tput                   -- put records in multi-threaded mod
-    kvdb tget                   -- get records in multi-threaded mod
-    kvdb tdel                   -- del records in multi-threaded mod
-    kvdb tops                   -- operate records in multi-threaded mod
+    kv rget                   -- get record from the databse randomly
+    kv tput                   -- put records in multi-threaded mod
+    kv tget                   -- get records in multi-threaded mod
+    kv tdel                   -- del records in multi-threaded mod
+    kv tops                   -- operate records in multi-threaded mod
 `)
 }
 
