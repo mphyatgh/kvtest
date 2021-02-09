@@ -17,6 +17,7 @@ import "C"
 import (
 	"errors"
 	"unsafe"
+	"kv/db"
 )
 
 type Kvdb struct {
@@ -33,12 +34,16 @@ mode is one of:
   "c" - rw / create
   "n" - new db
 */
-func Open(filename string, mode string) (db *Kvdb, err error) {
+func KvdbOpen(filename string) (db *Kvdb, err error) {
 	db = new(Kvdb)
 	cs := C.CString(filename)
 	defer C.free(unsafe.Pointer(cs))
 	db.fd = C.kvdb_open(cs)
 	return db, nil
+}
+
+func (db *Kvdb)Close() {
+	C.kvdb_close(db.fd)
 }
 
 func (db *Kvdb)Get(key uint64) (uint64, error) {
@@ -73,5 +78,34 @@ func (db *Kvdb)Next(sk uint64) (uint64, uint64, error) {
 		return 0, 0, errors.New("error")
 	}
 	return uint64(ck), uint64(cv), nil
+}
+
+func (db *Kvdb)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
+	var (
+		k uint64
+		v uint64
+		err error
+		cont bool
+	)
+	cont = true
+	k = k1
+	v, err = db.Get(k)
+	if err==nil {
+		cont = f(k, v)
+	}
+	for ;cont;{
+		k, v, err = db.Next(k)
+		if err!=nil {
+			return err
+		}
+		cont = f(k, v)
+	}
+	return nil
+}
+
+func cdbTest() {
+	var d db.DB
+	d, _ = KvdbOpen("test.kvdb")
+	d.Close()
 }
 

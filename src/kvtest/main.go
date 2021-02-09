@@ -5,13 +5,13 @@ import (
 	"os"
 	"log"
 	"strconv"
-	_ "crypto/md5"
 	"hash/crc32"
 	"hash/crc64"
 	"encoding/binary"
 	"bytes"
 	"time"
-	_ "kv/cdb"
+	dbi "kv/db"
+	"kv/cdb"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 
 var (
 	gCrc64tbl = crc64.MakeTable(crc64.ISO)
-	db  *DB
+	db  dbi.DB
 	nTotal int
 	nValid int
 )
@@ -150,7 +150,12 @@ func main() {
 		help()
 		return
 	}
-	if db, err = dbOpen(dbFile, "c"); err!=nil {
+	if os.Args[0]=="./kv" {
+		db, err = cdb.KvdbOpen(dbFile)
+	} else {
+		db, err = gdbmOpen(dbFile, "c")
+	}
+	if err!=nil {
 		log.Fatal(err)
 	}
 	defer db.Close()

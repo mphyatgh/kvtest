@@ -10,14 +10,14 @@ import (
 
 const MaxUint = ^uint64(0)
 
-type DB struct {
+type Gdbm struct {
 	gdbm *gdbm.Database
 	name string
 	mutex sync.Mutex
 }
 
-func dbOpen(fname, mode string) (* DB, error) {
-	r := new(DB)
+func gdbmOpen(fname, mode string) (* Gdbm, error) {
+	r := new(Gdbm)
 	db, err := gdbm.Open(fname, mode)
 	r.gdbm = db
 	r.name = fname
@@ -28,7 +28,7 @@ func i2s(v uint64) string {
 	return fmt.Sprintf("%016x", v)
 }
 
-func (d *DB)Put(key, value uint64) error {
+func (d *Gdbm)Put(key, value uint64) error {
 	sk := i2s(key)
 	sv := i2s(value)
 	d.mutex.Lock()
@@ -37,7 +37,7 @@ func (d *DB)Put(key, value uint64) error {
 	return err
 }
 
-func (d *DB)Get(key uint64) (uint64, error) {
+func (d *Gdbm)Get(key uint64) (uint64, error) {
 	val := uint64(0)
 	sk := i2s(key)
 	d.mutex.Lock()
@@ -50,7 +50,7 @@ func (d *DB)Get(key uint64) (uint64, error) {
 }
 
 
-func (d *DB)Del(key uint64) error {
+func (d *Gdbm)Del(key uint64) error {
 	sk := i2s(key)
 	d.mutex.Lock()
 	err := d.gdbm.Delete(sk)
@@ -58,7 +58,7 @@ func (d *DB)Del(key uint64) error {
 	return err
 }
 
-func (d *DB)Close() {
+func (d *Gdbm)Close() {
 	d.gdbm.Close()
 }
 
@@ -70,7 +70,7 @@ func h2u(h string) uint64 {
 	return v
 }
 
-func (d *DB)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
+func (d *Gdbm)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
 	var (
 		sk, sv string
 		k, v uint64
