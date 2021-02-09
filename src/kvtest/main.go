@@ -21,6 +21,8 @@ const (
 var (
 	gCrc64tbl = crc64.MakeTable(crc64.ISO)
 	db  *DB
+	nTotal int
+	nValid int
 )
 
 func help() {
@@ -86,7 +88,7 @@ func dbIns(num int) {
 	for i := 0; i < num; i++ {
 		seq := uint64(i)
 		k := genKey(seq)
-		v := genVal(seq)
+		v := genVal(k)
 		if err := db.Put(k, v); err != nil {
 			log.Fatal(err)
 		}
@@ -97,6 +99,16 @@ func dbIns(num int) {
 	fmt.Printf("total time:      %s\n", spt)
 	fmt.Printf("time per record: %s\n", tpr)
 }
+
+func verifyFunc(key, value uint64) bool {
+	v := genVal(key)
+	if v==value {
+		nValid ++
+	}
+	nTotal++
+	return true
+}
+
 
 func delFunc(key, value uint64) bool {
 	if err := db.Del(key); err != nil {
@@ -181,6 +193,12 @@ func main() {
 	case "clr":
 		lenEqs(os.Args, 2)
 		db.List(0, MaxUint, delFunc)
+	case "verify":
+		nValid = 0
+		nTotal = 0
+		lenEqs(os.Args, 2)
+		db.List(0, MaxUint, verifyFunc)
+		fmt.Printf("total: %d, valid: %d, invalid: %d\n", nTotal, nValid, nTotal-nValid)
 	default:
 		help()
 		return
