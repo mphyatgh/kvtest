@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 
-typedef void *kvdb_t; 
+struct kvdb_s;
+typedef struct kvdb_s *kvdb_t; 
 
 kvdb_t kvdb_open(char *name);
 int kvdb_close(kvdb_t db);

@@ -1,10 +1,12 @@
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
 #include "kvdb.h"
 
 kvdb_t kvdb_open(char *name)
 {
+	printf("kvdb -----\n");
 	return NULL;
 }
 
