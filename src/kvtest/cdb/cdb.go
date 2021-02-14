@@ -72,34 +72,26 @@ func (db *Kvdb)Del(key uint64) error {
 }
 
 func (db *Kvdb)Next(sk uint64) (uint64, uint64, error) {
-	var ck, cv C.uint64_t
-	ret := C.kvdb_next(db.fd, C.uint64_t(sk), &ck, &cv)
-	if ret!=0 {
-		return 0, 0, errors.New("error")
-	}
-	return uint64(ck), uint64(cv), nil
+	return 0, 0, nil
 }
 
 func (db *Kvdb)List(k1, k2 uint64, f func (uint64, uint64) bool) error {
 	var (
-		k uint64
-		v uint64
-		err error
 		cont bool
+		cur C.cursor_t
+		k, v C.uint64_t
 	)
+
 	cont = true
-	k = k1
-	v, err = db.Get(k)
-	if err==nil {
-		cont = f(k, v)
-	}
-	for ;cont;{
-		k, v, err = db.Next(k)
-		if err!=nil {
-			return err
+	cur = C.kvdb_open_cursor(db.fd, C.uint64_t(k1), C.uint64_t(k2))
+	for ;cont; {
+		ret := C.kvdb_get_next(db.fd, cur, &k, &v)
+		if ret<0 {
+			break
 		}
-		cont = f(k, v)
+		cont = f(uint64(k), uint64(v))
 	}
+	C.kvdb_close_cursor(db.fd, cur)
 	return nil
 }
 
